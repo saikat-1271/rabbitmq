@@ -10,9 +10,11 @@ export class VendorService {
 
   async syncvendor(vendorid: string) {
     try {
+      // fetching updated vendor data
       const vendordata: VendorProduct[] = await this.Vendorrepo.findvendor(vendorid);
       if (vendordata.length > 0) {
         console.log('Updated data received -->', JSON.stringify(vendordata))
+        // upserting new and existing data stock
         await this.Vendorrepo.updatelocalproduct(vendordata)
       }
 

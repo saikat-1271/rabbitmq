@@ -33,11 +33,13 @@ async function EnqueueWorker() {
     await channel.assertQueue('orders', { durable: true })
     channel.consume('orders', async (msg) => {
       if (!msg) return;
-      console.log(msg)
-      const { productId, quantity, vendorId } = JSON.parse(msg.content.toString());
+      const { productId, quantity, vendorId, orderid } = JSON.parse(msg.content.toString());
+      console.log('Processsing order for ', JSON.stringify({ productId, quantity, vendorId, orderid }))
 
       try {
+        // creating transaction
         await dataSource.transaction(async (manager) => {
+          //sync db for the specific vendor of corresponding order
           if (vendorId) {
             await vendorsync(vendorId);
           }
@@ -54,27 +56,55 @@ async function EnqueueWorker() {
 
           }
 
+          // if stock available, update product 
           await manager.createQueryBuilder().update('product').set({
             stock: (product.stock)
           }).where('id =:id', { id: productId }).execute()
 
+          // update order status to success
           await manager.createQueryBuilder()
             .update('order')
             .set({ status: OrderStatus.success })
+            .where('id =:orderid', { orderid: orderid })
             .execute();
         })
         channel.ack(msg);
       } catch (err) {
-        await dataSource.createQueryBuilder()
-          .update('order')
-          .set({ status: OrderStatus.failed })
-          .execute();
-        console.error('Transaction failed, rolled back:', err);
-        channel.nack(msg, false, false);
+        console.error('Transaction failed, rolled back:', err.message);
+
+        // Retry logic
+        const maxretries = 3;
+        const retries = msg.properties.headers['retrycount'] || 0;
+        console.log('retries count -->', retries)
+
+        if (retries < maxretries) {
+          const newheaders = {
+            ...msg.properties.headers,
+            'retrycount': retries + 1,
+          };
+
+          //reenqueue
+          channel.sendToQueue(msg.fields.routingKey, msg.content, {
+            headers: newheaders,
+            persistent: true,
+          });
+
+          // mark as failed msg
+          channel.ack(msg);
+        } else {
+          // After max retries, mark order as failed
+          await dataSource.createQueryBuilder()
+            .update('order')
+            .set({ status: OrderStatus.failed })
+            .where('id =:orderid', { orderid: orderid })
+            .execute();
+
+          channel.nack(msg, false, false); // drop msg permanently
+        }
       }
     });
   } catch (e) {
-    console.error(e)
+    console.error(e.message)
   }
 }
 EnqueueWorker();

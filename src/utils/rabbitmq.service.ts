@@ -1,5 +1,6 @@
 import * as amqplib from 'amqplib'
 
+/** defines queuename */
 export async function sendenqueue(queuename: string, data: object) {
   try {
     const conn = await amqplib.connect('amqp://localhost')
