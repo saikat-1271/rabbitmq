@@ -24,7 +24,6 @@ Create a `.env` file:
 
 ```env
 PG_HOST='ep-weathered-salad-a4mqezx3.us-east-1.aws.neon.tech'
-URL='postgresql://neondb_owner:npg_P6EmjgNnkZe3@ep-cold-bush-a4yz7xvt.us-east-1.aws.neon.tech/neondb?sslmode=require'
 PG_DATABASE='neondb'
 PG_USER='neondb_owner'
 PG_DATABASE='npg_P6EmjgNnkZe3'
