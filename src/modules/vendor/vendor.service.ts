@@ -35,5 +35,22 @@ export class VendorService {
     }
   }
 
+  async allproduct() {
+    try {
+      return this.Vendorrepo.allproduct();
+
+    } catch (e) {
+      throw e
+    }
+  }
+  async allvendorproduct() {
+    try {
+      return this.Vendorrepo.allvendorproduct();
+
+    } catch (e) {
+      throw e
+    }
+  }
+
 
 }

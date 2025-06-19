@@ -14,5 +14,24 @@ export class VendorController {
   syncvendoror() {
     return this.vendorService.autoSyncVendors();
   }
+  @Get('allproduct')
+  async allproduct() {
+    try {
+      return this.vendorService.allproduct();
+
+    } catch (e) {
+      throw e
+    }
+  }
+  @Get('allvendorproduct')
+  async allvendorproduct() {
+    try {
+      return this.vendorService.allvendorproduct();
+
+    } catch (e) {
+      throw e
+    }
+  }
+
 
 }
