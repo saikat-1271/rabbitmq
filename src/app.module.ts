@@ -5,23 +5,21 @@ import { ConfigModule } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { Order } from './entities/order.entity'
 import { Product } from './entities/product.entity'
-import { TypeormConfig } from './configs/appconfig'
 import { OrderModule } from './modules/order/order.module';
-
+import { getDBConfig } from './configs/appconfig'
+import { VendorModule } from './modules/vendor/vendor.module';
+import * as dotenv from 'dotenv';
+dotenv.config();
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.URL,
-      entities: [Product, Order],
-      // synchronize: true,
-    }),
+    TypeOrmModule.forRoot(getDBConfig()),
     OrderModule,
+    VendorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }
