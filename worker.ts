@@ -39,12 +39,28 @@ async function EnqueueWorker() {
       try {
         // creating transaction
         await dataSource.transaction(async (manager) => {
+
+          const orderinfo = await manager.createQueryBuilder()
+            .select('status')
+            .from('order', 'o')
+            .where('id = :orderid', { orderid })
+            .getRawOne();
+
+            // checking if order is in pending mode, if not skip
+          if (!orderinfo || orderinfo.status !== OrderStatus.pending) {
+            console.log(`Skipping already processed order ${orderid}`);
+            channel.ack(msg);
+            return;
+          }
           //sync db for the specific vendor of corresponding order
           if (vendorId) {
             await vendorsync(vendorId);
           }
 
-          const product = await manager.createQueryBuilder().select().from('product', 'p').where('p.id = :productid', { productid: productId }).getRawOne();
+          const product = await manager.createQueryBuilder()
+          .select().from('product', 'p')
+          .where('p.id = :productid', { productid: productId })
+          .getRawOne();
 
           if (!product) {
             throw new Error(`Product doesnot exist for productid ${productId}`);
