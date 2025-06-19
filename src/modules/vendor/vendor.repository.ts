@@ -45,6 +45,18 @@ export class VendorRepo {
       throw e
     }
   }
+  async allvendors() {
+    try {
+ 
+      const res = await this.vendorProductRepo.createQueryBuilder('v').select('DISTINCT (v.vendorId)').getRawMany();
+      const vendorlist = res && res.length > 0 ? res.map((v) => v.vendorId) : [];
+      return vendorlist;
+ 
+
+    } catch (e) {
+      throw e
+    }
+  }
 
 
 }

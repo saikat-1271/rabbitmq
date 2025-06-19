@@ -10,5 +10,9 @@ export class VendorController {
   syncvendor(@Param('vendorid') vendorid: string) {
     return this.vendorService.syncvendor(vendorid);
   }
+  @Get('vendorsync')
+  syncvendoror() {
+    return this.vendorService.autoSyncVendors();
+  }
 
 }

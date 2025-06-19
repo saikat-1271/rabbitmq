@@ -9,9 +9,11 @@ import { OrderModule } from './modules/order/order.module';
 import { getDBConfig } from './configs/appconfig'
 import { VendorModule } from './modules/vendor/vendor.module';
 import * as dotenv from 'dotenv';
+import { ScheduleModule } from '@nestjs/schedule'
 dotenv.config();
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
     }),

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { VendorRepo } from './vendor.repository';
 import { VendorProduct } from 'src/entities/vendorproduct.entity';
+import { Cron } from '@nestjs/schedule';
 
 
 @Injectable()
@@ -21,6 +22,16 @@ export class VendorService {
       return 'success';
     } catch (e) {
       throw e
+    }
+  }
+
+
+  @Cron('0,30 * * * *')
+  async autoSyncVendors() {
+    const vendors = await this.Vendorrepo.allvendors();
+    for (const vendor of vendors) {
+      await this.syncvendor(vendor);
+      console.log(`[Auto Sync] Synced vendor: ${vendor}`);
     }
   }
 
