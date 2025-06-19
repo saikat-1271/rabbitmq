@@ -1,0 +1,28 @@
+🧩 2. Simple System Design Doc (system-design.md)
+📦 Stock Sync Flow
+Vendors expose stock APIs.
+
+A scheduled job (@Cron) or a CLI triggers sync.
+
+The system fetches stock from each vendor and updates local PostgreSQL.
+
+🧾 Order Placement Architecture
+REST API /order accepts orders.
+
+Orders are validated, saved to DB with PENDING status.
+
+Pushed to RabbitMQ order_queue.
+
+⚙️ Queue-Based Worker Model
+RabbitMQ consumes messages via a worker service.
+
+Worker validates stock availability (strong consistency check).
+
+Updates stock, marks order as CONFIRMED or FAILED.
+
+🔐 Consistency Guarantees
+Strong Consistency: Local stock is treated as source of truth during order placement.
+
+Eventually Consistent: Vendor stock via sync jobs.
+
+Idempotency: Queue workers use nack or ack logic with retries.
