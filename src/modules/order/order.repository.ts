@@ -40,4 +40,18 @@ export class OrderRepo {
       throw e
     }
   }
+  async productexist(productId: number) {
+    try {
+      const res = await this.productrepository
+        .createQueryBuilder('p')
+        .select()
+        .where('p.id = :id', { id: productId })
+        .getOne();
+
+      return res?.vendorId || null
+    } catch (e) {
+
+      throw e
+    }
+  }
 }

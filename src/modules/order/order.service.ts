@@ -13,6 +13,12 @@ export class OrderService {
     try {
       console.log('incoming order --> ', JSON.stringify(createOrderDto));
       //insert order in table as pending status
+      const productinfo = await this.orderrepo.productexist(createOrderDto.productId)
+      if (productinfo) {
+        throw new HttpException('Product not found', HttpStatusCode.NotFound)
+
+      }
+
       const orderobj: InsertResult = await this.orderrepo.insertorder(createOrderDto);
       const orderid = orderobj?.raw[0]?.id || null;
       if (!orderid) {
