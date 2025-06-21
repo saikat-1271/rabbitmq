@@ -16,8 +16,9 @@ Create a `.env` file:
 
 ###  Start server
 - npm install
+- start RabbitMQ service in localhost
 - npm run start:dev ( to run the server)
-- npm run start:worker ( to run the worker)
+- npm run start:worker ( to run the worker in a different terminal)
 
 
 
