@@ -14,7 +14,8 @@ export class OrderService {
       console.log('incoming order --> ', JSON.stringify(createOrderDto));
       //insert order in table as pending status
       const productinfo = await this.orderrepo.productexist(createOrderDto.productId)
-      if (productinfo) {
+      if (!productinfo) {
+        console.warn('Product not found', JSON.stringify(createOrderDto))
         throw new HttpException('Product not found', HttpStatusCode.NotFound)
 
       }
