@@ -18,13 +18,13 @@ export class OrderService {
       if (!orderid) {
         throw new HttpException('Unable to fetch orderid', HttpStatusCode.BadRequest)
       }
-      const getvendorId = await this.orderrepo.getVendorId(createOrderDto.productId) 
+      const getvendorId = await this.orderrepo.getVendorId(createOrderDto.productId)
       console.log('Order saved --> ', JSON.stringify(createOrderDto));
       // sending vendorid in enqueue body to sync specific vendor befor confirming order
       await sendenqueue('orders', { ...createOrderDto, vendorId: getvendorId, orderid: orderid })
 
       return {
-        status: 'success'
+        status: 'Your order is created'
       }
     } catch (e) {
       throw e

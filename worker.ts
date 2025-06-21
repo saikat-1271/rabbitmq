@@ -53,9 +53,9 @@ async function EnqueueWorker() {
             return;
           }
           //sync db for the specific vendor of corresponding order
-          if (vendorId) {
-            await vendorsync(vendorId);
-          }
+          // if (vendorId) {
+          //   await vendorsync(vendorId);
+          // }
 
           const product = await manager.createQueryBuilder()
           .select().from('product', 'p')
@@ -88,7 +88,7 @@ async function EnqueueWorker() {
       } catch (err) {
         console.error('Transaction failed, rolled back:', err.message);
 
-        // Retry logic
+        // Retry 3 times if failed
         const maxretries = 3;
         const retries = msg.properties.headers['retrycount'] || 0;
         console.log('retries count -->', retries)
